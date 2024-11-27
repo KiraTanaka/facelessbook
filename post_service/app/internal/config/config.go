@@ -19,7 +19,9 @@ type Config struct {
 func GetConfig() (*Config, error) {
 	config := &Config{}
 
-	err := cleanenv.ReadConfig(".env", &config)
+	log.Info("Read application config")
+
+	err := cleanenv.ReadConfig("./post_service/app/.env", config)
 
 	if err != nil {
 		return nil, fmt.Errorf("server config error: %w", err)

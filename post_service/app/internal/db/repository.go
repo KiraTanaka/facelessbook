@@ -1,19 +1,20 @@
-package repository
+package db
 
 import (
 	"facelessbook/post_service/app/internal/config"
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
 
 	log "github.com/sirupsen/logrus"
 )
 
-type repository struct {
+type Repository struct {
 	db *sqlx.DB
 }
 
-func NewDbConnect(config *config.Config) {
+func NewConnect(config *config.Config) (*Repository, error) {
 	var err error
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=disable",
@@ -22,10 +23,15 @@ func NewDbConnect(config *config.Config) {
 	db, err := sqlx.Connect("postgres", psqlInfo)
 	if err != nil {
 		log.Error(err)
+		return nil, err
 	}
 
 	err = db.Ping()
 	if err != nil {
 		log.Error(err)
+		return nil, err
 	}
+	repository := &Repository{db: db}
+
+	return repository, nil
 }
