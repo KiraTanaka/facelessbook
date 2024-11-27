@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"facelessbook/post_service/app/internal/db"
+	"facelessbook/assessment_service/app/internal/db"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -12,7 +12,7 @@ func InitRoutes(repository *db.Repository) *gin.Engine {
 	routes.GET("/", hello)
 	routeGroup := routes.Group("/api")
 
-	InitPostRoutes(routeGroup, repository)
+	InitPostLikesRoutes(routeGroup, repository)
 	return routes
 }
 
