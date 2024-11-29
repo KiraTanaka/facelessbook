@@ -1,0 +1,24 @@
+// Версия ProtoBuf
+syntax = "proto3";
+
+// Текущий пакет - указывает пространство имен для сервиса и сообщений. Помогает избегать конфликтов имен.
+package assessment_service;
+
+// Настройки для генерации Go кода.
+option go_package = "github.com/KiraTanaka/facelessbook/assessment_service/pkg/protos";
+
+// PostLikes is service for assessment posts.
+service PostLikes {
+  // GetLikeCount returns the likes of the post.
+  rpc GetLikeCount (GetLikeCountRequest) returns (GetLikeCountResponse);
+}
+
+// Объект, который отправляется при вызове RPC-метода (ручки) GetLikes.
+message GetLikeCountRequest {
+  string post_id = 1;
+}
+
+// Объект, который метод (ручка) вернёт.
+message GetLikeCountResponse {
+  int64 cnt = 1;
+}
