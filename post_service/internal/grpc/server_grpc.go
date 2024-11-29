@@ -6,7 +6,7 @@ import (
 	"google.golang.org/grpc"
 
 	// Сгенерированный код
-	ssov1 "github.com/KiraTanaka/facelessbook/assessment_service/pkg/protos"
+	ssov1 "github.com/KiraTanaka/facelessbook/tree/main/assessment_service/pkg/protos"
 )
 
 type serverAPI struct {
