@@ -5,7 +5,7 @@ syntax = "proto3";
 package assessment_service;
 
 // Настройки для генерации Go кода.
-option go_package = "github.com/KiraTanaka/facelessbook/tree/main/assessment_service/pkg/protos";
+option go_package = "github.com/KiraTanaka/facelessbook/assessment_service/pkg/protos";
 
 // PostLikes is service for assessment posts.
 service PostLikes {
