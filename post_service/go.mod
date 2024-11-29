@@ -12,7 +12,6 @@ require (
 
 require (
 	github.com/BurntSushi/toml v1.2.1 // indirect
-	github.com/KiraTanaka/facelessbook v0.0.0-20241129072153-dee3f0d2c1e2 // indirect
 	github.com/bytedance/sonic v1.11.6 // indirect
 	github.com/bytedance/sonic/loader v0.1.1 // indirect
 	github.com/cloudwego/base64x v0.1.4 // indirect
