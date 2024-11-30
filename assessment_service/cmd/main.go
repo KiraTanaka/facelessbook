@@ -12,5 +12,6 @@ func main() {
 		log.Fatal()
 		return
 	}
-	server.Run()
+	//server.Run()
+	server.GRPCServer.MustRun()
 }
