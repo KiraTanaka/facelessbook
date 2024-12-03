@@ -1,9 +1,11 @@
 package server
 
 import (
+	grpc "post_service/internal/clients/assessment_service"
 	"post_service/internal/config"
 	"post_service/internal/db"
 	"post_service/internal/handlers"
+	"post_service/internal/services"
 
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
@@ -30,7 +32,19 @@ func NewServer() (*Server, error) {
 		return nil, err
 	}
 
-	server.Routes = handlers.InitRoutes(repository)
+	grpcClient, err := grpc.NewClient(server.Config)
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
+
+	postService, err := services.Init(repository, grpcClient)
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
+
+	server.Routes = handlers.InitRoutes(postService)
 
 	return server, nil
 }

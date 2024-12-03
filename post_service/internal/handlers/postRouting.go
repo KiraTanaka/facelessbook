@@ -2,19 +2,18 @@ package handlers
 
 import (
 	"net/http"
-	"post_service/internal/db"
+	"post_service/internal/services"
 
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 )
 
 type postHandler struct {
-	repository *db.Repository
+	PostService services.PostService
 }
 
-func InitPostRoutes(routes *gin.RouterGroup, repository *db.Repository) {
-	postHandler := &postHandler{}
-	postHandler.repository = repository
+func InitPostRoutes(routes *gin.RouterGroup, postService services.PostService) {
+	postHandler := &postHandler{PostService: postService}
 	postRoutes := routes.Group("/posts")
 	//GET
 	postRoutes.GET("/", postHandler.GetListPosts)
@@ -23,20 +22,20 @@ func InitPostRoutes(routes *gin.RouterGroup, repository *db.Repository) {
 }
 
 func (h *postHandler) GetListPosts(c *gin.Context) {
-	posts, err := h.repository.GetListPosts()
+	posts, err := h.PostService.GetListPosts()
 
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, "error")
+		c.AbortWithStatusJSON(http.StatusInternalServerError, err)
 	}
 	c.JSON(http.StatusOK, posts)
 }
 
 func (h *postHandler) GetPost(c *gin.Context) {
 	postId := c.Param("id")
-	post, err := h.repository.GetPost(postId)
+	post, err := h.PostService.GetPost(postId)
 
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, "error")
+		c.AbortWithStatusJSON(http.StatusInternalServerError, err)
 	}
 	log.Info(post)
 	c.JSON(http.StatusOK, post)

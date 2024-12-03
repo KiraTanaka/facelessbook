@@ -2,17 +2,17 @@ package handlers
 
 import (
 	"net/http"
-	"post_service/internal/db"
+	"post_service/internal/services"
 
 	"github.com/gin-gonic/gin"
 )
 
-func InitRoutes(repository *db.Repository) *gin.Engine {
+func InitRoutes(postService services.PostService) *gin.Engine {
 	routes := gin.Default()
 	routes.GET("/", hello)
 	routeGroup := routes.Group("/api")
 
-	InitPostRoutes(routeGroup, repository)
+	InitPostRoutes(routeGroup, postService)
 	return routes
 }
 
