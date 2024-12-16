@@ -1,7 +1,7 @@
 package main
 
 import (
-	server "user_service/internal"
+	server "notification_service/internal"
 
 	log "github.com/sirupsen/logrus"
 )
