@@ -4,7 +4,6 @@ import (
 	"user_service/internal/config"
 	"user_service/internal/db"
 	server_grpc "user_service/internal/grpc"
-	"user_service/internal/handlers"
 	"user_service/internal/services"
 
 	"github.com/gin-gonic/gin"
@@ -34,7 +33,7 @@ func NewServer() (*Server, error) {
 		return nil, err
 	}
 
-	authService, err := services.NewAuthService(repository)
+	authService, err := services.NewAuthService(repository, server.Config.Token_TTL)
 	if err != nil {
 		log.Error(err)
 		return nil, err
@@ -42,11 +41,12 @@ func NewServer() (*Server, error) {
 
 	server.GRPCServer = server_grpc.New(server.Config, authService)
 
-	server.Routes = handlers.InitRoutes(repository)
+	//server.Routes = handlers.InitRoutes(repository)
 
 	return server, nil
 }
 
 func (server *Server) Run() {
-	server.Routes.Run(server.Config.ServerAddress)
+	//server.Routes.Run(server.Config.ServerAddress)
+	server.GRPCServer.Run()
 }

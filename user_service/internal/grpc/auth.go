@@ -22,7 +22,7 @@ func RegisterAuthServer(gRPCServer *grpc.Server, authService services.AuthServic
 }
 
 func (s *serverAuth) Register(ctx context.Context, request *auth.RegisterRequest) (*auth.RegisterResponse, error) {
-	if err := validateLoginInformation(request); err != nil {
+	if err := validateRegistrationData(request); err != nil {
 		return nil, err
 	}
 
@@ -31,11 +31,11 @@ func (s *serverAuth) Register(ctx context.Context, request *auth.RegisterRequest
 		return nil, status.Error(codes.Internal, "failed register")
 	}
 
-	return &auth.RegisterResponse{user_id: userId}, nil
+	return &auth.RegisterResponse{UserId: userId}, nil
 }
 
 func (s *serverAuth) Login(ctx context.Context, request *auth.LoginRequest) (*auth.LoginResponse, error) {
-	if err := validateLoginInformation(request); err != nil {
+	if err := validateLoginData(request); err != nil {
 		return nil, err
 	}
 
@@ -45,15 +45,26 @@ func (s *serverAuth) Login(ctx context.Context, request *auth.LoginRequest) (*au
 
 	}
 
-	return &auth.LoginResponse{token: token}, nil
+	return &auth.LoginResponse{Token: token}, nil
 }
 
-func validateLoginInformation(request *auth.LoginRequest) error {
+func validateRegistrationData(request *auth.RegisterRequest) error {
 	if request.GetPhone() == "" {
-		return nil, status.Error(codes.InvalidArgument, "phone is required")
+		return status.Error(codes.InvalidArgument, "phone is required")
 	}
 	if request.GetPassword() == "" {
-		return nil, status.Error(codes.InvalidArgument, "password is required")
+		return status.Error(codes.InvalidArgument, "password is required")
+	}
+	return nil
+
+}
+
+func validateLoginData(request *auth.LoginRequest) error {
+	if request.GetPhone() == "" {
+		return status.Error(codes.InvalidArgument, "phone is required")
+	}
+	if request.GetPassword() == "" {
+		return status.Error(codes.InvalidArgument, "password is required")
 	}
 	return nil
 
