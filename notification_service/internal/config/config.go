@@ -17,7 +17,6 @@ type Config struct {
 	Password      string        `env:"POSTGRES_PASSWORD" env-required:"true"`
 	GrpcPort      int           `env:"GRPC_PORT" env-required:"true"`
 	GrpcTimeout   time.Duration `env:"GRPC_TIMEOUT" env-required:"true"`
-	Token_TTL     time.Duration `env:"TOKEN_TTL" env-required:"true"`
 }
 
 func GetConfig() (*Config, error) {
