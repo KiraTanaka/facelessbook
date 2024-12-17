@@ -1,21 +1,20 @@
 package server
 
 import (
-	"notification_service/internal/config"
-	"notification_service/internal/db"
-	server_grpc "notification_service/internal/grpc"
-	"notification_service/internal/handlers"
-	"notification_service/internal/services"
+	grpc "api_gateway/internal/clients/user_service"
+	"api_gateway/internal/config"
+	"api_gateway/internal/handlers"
+	"api_gateway/internal/services"
 
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 )
 
 type Server struct {
-	Config              *config.Config
-	Routes              *gin.Engine
-	NotificationService services.NotificationService
-	GRPCServer          *server_grpc.GRPCServer
+	Config      *config.Config
+	Routes      *gin.Engine
+	AuthService services.AuthService
+	grpcClients *grpc.Clients
 }
 
 func NewServer() (*Server, error) {
@@ -28,20 +27,19 @@ func NewServer() (*Server, error) {
 		return nil, err
 	}
 
-	repository, err := db.NewConnect(server.Config)
-	if err != nil {
-		log.Error(err)
-		return nil, err
-	}
-	notificationService, err := services.NewNotificationService(repository)
+	server.grpcClients, err = grpc.NewClient(server.Config)
 	if err != nil {
 		log.Error(err)
 		return nil, err
 	}
 
-	server.GRPCServer = server_grpc.New(server.Config, notificationService)
+	authService, err := services.NewAuthService(server.grpcClients.Auth)
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
 
-	server.Routes = handlers.InitRoutes(repository)
+	server.Routes = handlers.InitRoutes(authService)
 
 	return server, nil
 }

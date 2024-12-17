@@ -1,7 +1,7 @@
 package main
 
 import (
-	server "notification_service/internal"
+	server "api_gateway/internal"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -12,6 +12,5 @@ func main() {
 		log.Fatal()
 		return
 	}
-	//server.Run()
-	server.GRPCServer.MustRun()
+	server.Run()
 }

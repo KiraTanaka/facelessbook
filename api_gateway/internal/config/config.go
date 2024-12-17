@@ -15,6 +15,7 @@ type Config struct {
 	Dbname        string        `env:"POSTGRES_DATABASE" env-required:"true"`
 	User          string        `env:"POSTGRES_USERNAME" env-required:"true"`
 	Password      string        `env:"POSTGRES_PASSWORD" env-required:"true"`
+	GrpcHost      string        `env:"GRPC_HOST" env-required:"true"`
 	GrpcPort      int           `env:"GRPC_PORT" env-required:"true"`
 	GrpcTimeout   time.Duration `env:"GRPC_TIMEOUT" env-required:"true"`
 }

@@ -2,7 +2,6 @@ package jwt
 
 import (
 	"time"
-	"user_service/internal/jwt"
 	"user_service/internal/models"
 
 	"github.com/golang-jwt/jwt"
@@ -16,7 +15,7 @@ func NewToken(user *models.User, duration time.Duration) (string, error) {
 	claims["phone"] = user.Phone
 	claims["exp"] = time.Now().Add(duration).Unix()
 
-	tokenStr, err := token.SignedString()
+	tokenStr, err := token.SignedString([]byte("secret"))
 	if err != nil {
 		return "", err
 	}

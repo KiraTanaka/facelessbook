@@ -1,18 +1,20 @@
 package handlers
 
 import (
-	"assessment_service/internal/db"
+	"api_gateway/internal/services"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
-func InitRoutes(repository *db.Repository) *gin.Engine {
+func InitRoutes(authService services.AuthService) *gin.Engine {
 	routes := gin.Default()
 	routes.GET("/", hello)
 	routeGroup := routes.Group("/api")
+	{
+		InitAuthHandler(routeGroup, authService)
+	}
 
-	InitPostLikesRoutes(routeGroup, repository)
 	return routes
 }
 
