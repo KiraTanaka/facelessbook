@@ -1,4 +1,4 @@
-package handlers
+package http
 
 import (
 	"api_gateway/internal/services"
@@ -7,12 +7,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func InitRoutes(authService services.AuthService) *gin.Engine {
+func InitRoutes(services *services.Services) *gin.Engine {
 	routes := gin.Default()
 	routes.GET("/", hello)
 	routeGroup := routes.Group("/api")
 	{
-		InitAuthHandler(routeGroup, authService)
+		InitAuthHandler(routeGroup, services.Auth)
 	}
 
 	return routes

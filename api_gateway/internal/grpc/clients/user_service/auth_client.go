@@ -21,7 +21,7 @@ type AuthClient struct {
 	Api auth.AuthClient
 }
 
-func NewClient(config *config.Config) (*Clients, error) {
+func NewClient(config *config.GrpcConfig) (*Clients, error) {
 	conn, err := grpc.NewClient(fmt.Sprintf("%s:%d", config.GrpcHost, config.GrpcPort), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("did not connect to grpc server: %v", err)
