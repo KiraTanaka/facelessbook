@@ -1,7 +1,6 @@
 package grpc
 
 import (
-	"api_gateway/internal/config"
 	"context"
 	"fmt"
 	"time"
@@ -13,23 +12,19 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type Clients struct {
-	Auth *AuthClient
-}
-
 type AuthClient struct {
 	Api auth.AuthClient
 }
 
-func NewClient(config *config.GrpcConfig) (*Clients, error) {
-	conn, err := grpc.NewClient(fmt.Sprintf("%s:%d", config.GrpcHost, config.GrpcPort), grpc.WithTransportCredentials(insecure.NewCredentials()))
+func NewAuthClient(host string, port int) (*AuthClient, error) {
+	conn, err := grpc.NewClient(fmt.Sprintf("%s:%d", host, port), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("did not connect to grpc server: %v", err)
 	}
 
 	authClient := auth.NewAuthClient(conn)
 
-	return &Clients{Auth: &AuthClient{Api: authClient}}, nil
+	return &AuthClient{Api: authClient}, nil
 }
 
 func (c *AuthClient) Register(phone string, password string) (string, error) {

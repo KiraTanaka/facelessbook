@@ -14,7 +14,7 @@ type Repository struct {
 	db *sqlx.DB
 }
 
-func NewConnect(config *config.Config) (*Repository, error) {
+func NewConnect(config *config.DbConfig) (*Repository, error) {
 	var err error
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=disable",
@@ -31,7 +31,8 @@ func NewConnect(config *config.Config) (*Repository, error) {
 		log.Error(err)
 		return nil, err
 	}
-	repository := &Repository{db: db}
 
-	return repository, nil
+	return &Repository{
+		db: db,
+	}, nil
 }

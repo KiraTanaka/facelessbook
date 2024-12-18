@@ -1,4 +1,4 @@
-package server
+package http
 
 import (
 	grpc "post_service/internal/clients/assessment_service"
@@ -20,7 +20,7 @@ func NewServer() (*Server, error) {
 	server := &Server{}
 
 	var err error
-	server.Config, err = config.GetConfig()
+	server.Config, err = config.GetAppConfig()
 	if err != nil {
 		log.Error(err)
 		return nil, err

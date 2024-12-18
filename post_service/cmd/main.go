@@ -1,16 +1,16 @@
 package main
 
 import (
-	server "post_service/internal"
+	app "post_service/internal/app"
 
 	log "github.com/sirupsen/logrus"
 )
 
 func main() {
-	server, err := server.NewServer()
+	app, err := app.New()
 	if err != nil {
 		log.Fatal()
 		return
 	}
-	server.Run()
+	app.Run()
 }

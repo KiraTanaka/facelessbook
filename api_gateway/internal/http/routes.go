@@ -13,6 +13,7 @@ func InitRoutes(services *services.Services) *gin.Engine {
 	routeGroup := routes.Group("/api")
 	{
 		InitAuthHandler(routeGroup, services.Auth)
+		InitPostHandler(routeGroup, services.Post)
 	}
 
 	return routes

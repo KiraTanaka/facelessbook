@@ -1,21 +1,26 @@
 package services
 
 import (
-	grpc "api_gateway/internal/grpc/clients/user_service"
+	grpc "api_gateway/internal/grpc/clients"
 )
 
 type Services struct {
 	Auth AuthService
+	Post PostService
 }
 
 func Init(grpcClients *grpc.Clients) (*Services, error) {
-	var err error
-	services := &Services{}
-
-	services.Auth, err = NewAuthService(grpcClients.Auth)
+	auth, err := NewAuthService(grpcClients.Auth)
+	if err != nil {
+		return nil, err
+	}
+	post, err := NewPostService(grpcClients.Post)
 	if err != nil {
 		return nil, err
 	}
 
-	return services, nil
+	return &Services{
+		Auth: auth,
+		Post: post,
+	}, nil
 }

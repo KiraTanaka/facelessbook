@@ -1,4 +1,4 @@
-package handlers
+package http
 
 import (
 	"net/http"
@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func InitRoutes(postService services.PostService) *gin.Engine {
+func InitRoutes(services services.Services) *gin.Engine {
 	routes := gin.Default()
 	routes.GET("/", hello)
 	routeGroup := routes.Group("/api")

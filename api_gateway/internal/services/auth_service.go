@@ -1,7 +1,7 @@
 package services
 
 import (
-	grpc "api_gateway/internal/grpc/clients/user_service"
+	grpc "api_gateway/internal/grpc/clients"
 
 	log "github.com/sirupsen/logrus"
 )

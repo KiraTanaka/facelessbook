@@ -36,9 +36,10 @@ type DbConfig struct {
 }
 
 type GrpcConfig struct {
-	GrpcHost    string        `env:"GRPC_HOST" env-required:"true"`
-	GrpcPort    int           `env:"GRPC_PORT" env-required:"true"`
-	GrpcTimeout time.Duration `env:"GRPC_TIMEOUT" env-required:"true"`
+	GrpcHost     string        `env:"GRPC_HOST" env-required:"true"`
+	GrpcAuthPort int           `env:"GRPC_AUTH_PORT" env-required:"true"`
+	GrpcPostPort int           `env:"GRPC_POST_PORT" env-required:"true"`
+	GrpcTimeout  time.Duration `env:"GRPC_TIMEOUT" env-required:"true"`
 }
 
 func GetAppConfig() (*Config, error) {

@@ -2,36 +2,56 @@ package config
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/ilyakaznacheev/cleanenv"
 	log "github.com/sirupsen/logrus"
 )
 
 type Config struct {
-	ServerAddress string `env:"SERVER_ADDRESS" env-required:"true"`
-	Host          string `env:"POSTGRES_HOST" env-required:"true"`
-	Port          int    `env:"POSTGRES_PORT" env-required:"true"`
-	Dbname        string `env:"POSTGRES_DATABASE" env-required:"true"`
-	User          string `env:"POSTGRES_USERNAME" env-required:"true"`
-	Password      string `env:"POSTGRES_PASSWORD" env-required:"true"`
-	GrpcHost      string `env:"GRPC_HOST" env-required:"true"`
-	GrpcPort      int    `env:"GRPC_PORT" env-required:"true"`
-	GrpcTimeout   string `env:"GRPC_TIMEOUT" env-required:"true"`
+	HttpConfig *HttpConfig
+	DbConfig   *DbConfig
+	GrpcConfig *GrpcConfig
 }
 
-func GetConfig() (*Config, error) {
-	config := &Config{}
+type HttpConfig struct {
+	ServerAddress string `env:"HTTP_SERVER_ADDRESS" env-required:"true"`
+}
 
-	log.Info("Read application config")
+type DbConfig struct {
+	Host     string `env:"DB_HOST" env-required:"true"`
+	Port     int    `env:"DB_PORT" env-required:"true"`
+	Dbname   string `env:"DB_DATABASE" env-required:"true"`
+	User     string `env:"DB_USERNAME" env-required:"true"`
+	Password string `env:"DB_PASSWORD" env-required:"true"`
+}
 
-	err := cleanenv.ReadConfig(".env", config)
+type GrpcConfig struct {
+	GrpcHost    string        `env:"GRPC_HOST" env-required:"true"`
+	GrpcPort    int           `env:"GRPC_PORT" env-required:"true"`
+	GrpcTimeout time.Duration `env:"GRPC_TIMEOUT" env-required:"true"`
+}
 
-	log.Info(config)
+func GetAppConfig() (*Config, error) {
 
-	if err != nil {
-		return nil, fmt.Errorf("server config error: %w", err)
+	log.Info("starting to read application config")
+
+	httpConfig := &HttpConfig{}
+	dbConfig := &DbConfig{}
+	grpcConfig := &GrpcConfig{}
+	if err := cleanenv.ReadConfig(".env", httpConfig); err != nil {
+		return nil, fmt.Errorf("read http config error: %w", err)
 	}
+	if err := cleanenv.ReadConfig(".env", dbConfig); err != nil {
+		return nil, fmt.Errorf("read db config error: %w", err)
+	}
+	if err := cleanenv.ReadConfig(".env", grpcConfig); err != nil {
+		return nil, fmt.Errorf("read grpc config error: %w", err)
+	}
+	config := &Config{
+		HttpConfig: httpConfig,
+		DbConfig:   dbConfig,
+		GrpcConfig: grpcConfig}
 
-	log.Info("Reading of the server configuration parameters is completed.")
 	return config, nil
 }

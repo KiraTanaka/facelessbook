@@ -1,19 +1,21 @@
 package services
 
 import (
-	grpc "post_service/internal/clients/assessment_service"
 	"post_service/internal/db"
 	"post_service/internal/models"
+
+	log "github.com/sirupsen/logrus"
 )
 
 type postService struct {
 	repository *db.Repository
-	grpcClient *grpc.Client
+	//grpcClient *grpc.Client
 }
 
 type PostService interface {
-	GetListPosts() ([]models.Post, error)
-	GetPost(string) (models.PostDTO, error)
+	Create(*models.Post) (string, error)
+	PostById(string) (*models.Post, error)
+	ListPosts() ([]*models.Post, error)
 }
 
 func PostToDTO(post *models.Post) models.PostDTO {
@@ -25,32 +27,55 @@ func PostToDTO(post *models.Post) models.PostDTO {
 	}
 }
 
-func Init(repository *db.Repository, grpcClient *grpc.Client) (PostService, error) {
-	return &postService{repository: repository, grpcClient: grpcClient}, nil
+func NewPostService(repository *db.Repository) (PostService, error) {
+	return &postService{
+		repository: repository,
+	}, nil
 
 }
 
-func (s *postService) GetListPosts() ([]models.Post, error) {
-	posts, err := s.repository.GetListPosts()
+func (s *postService) Create(post *models.Post) (string, error) {
+	postId, err := s.repository.CreatePost(post)
 	if err != nil {
-		return posts, err
+		log.Error(err)
+		return "", err
+	}
+	return postId, nil
+}
+
+func (s *postService) PostById(postId string) (*models.Post, error) {
+	post, err := s.repository.PostById(postId)
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
+
+	return post, nil
+}
+
+func (s *postService) ListPosts() ([]*models.Post, error) {
+	posts, err := s.repository.ListPosts()
+	if err != nil {
+		log.Error(err)
+		return nil, err
 	}
 	return posts, nil
 }
 
-func (s *postService) GetPost(postId string) (models.PostDTO, error) {
-	var dto models.PostDTO
-	post, err := s.repository.GetPost(postId)
+func (s *postService) Update(postId string, newText string) (string, error) {
+	text, err := s.repository.UpdatePost(postId, newText)
 	if err != nil {
-		return dto, err
+		log.Error(err)
+		return "", err
 	}
-	dto = PostToDTO(post)
+	return text, nil
+}
 
-	likeCount, err := s.grpcClient.GetLikeCount(postId)
+func (s *postService) Delete(postId string) error {
+	err := s.repository.DeletePost(postId)
 	if err != nil {
-		return dto, err
+		log.Error(err)
+		return err
 	}
-	dto.LikeCount = likeCount
-
-	return dto, err
+	return nil
 }

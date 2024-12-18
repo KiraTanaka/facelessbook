@@ -2,7 +2,7 @@ package app
 
 import (
 	"api_gateway/internal/config"
-	grpc "api_gateway/internal/grpc/clients/user_service"
+	grpc "api_gateway/internal/grpc/clients"
 	"api_gateway/internal/http"
 	"api_gateway/internal/services"
 
@@ -26,7 +26,7 @@ func New() (*App, error) {
 		return nil, err
 	}
 
-	app.grpcClients, err = grpc.NewClient(app.config.GrpcConfig)
+	app.grpcClients, err = grpc.NewClients(app.config.GrpcConfig)
 	if err != nil {
 		log.Error(err)
 		return nil, err
