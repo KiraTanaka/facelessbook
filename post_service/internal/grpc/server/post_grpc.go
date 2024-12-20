@@ -68,6 +68,24 @@ func (s *postServer) ListPosts(ctx context.Context, request *pb.ListPostsRequest
 	return &pb.ListPostsResponse{Posts: postMessages}, nil
 }
 
+func (s *postServer) Update(ctx context.Context, request *pb.UpdateRequest) (*pb.UpdateResponse, error) {
+	newText, err := s.postService.Update(request.Id, request.Text)
+	if err != nil {
+		return nil, status.Error(codes.Internal, "failed create")
+	}
+
+	return &pb.UpdateResponse{NewText: newText}, nil
+}
+
+func (s *postServer) Delete(ctx context.Context, request *pb.DeleteRequest) (*pb.DeleteResponse, error) {
+	err := s.postService.Delete(request.Id)
+	if err != nil {
+		return nil, status.Error(codes.Internal, "failed create")
+	}
+
+	return &pb.DeleteResponse{}, nil
+}
+
 func PostModelToPostMessage(post *models.Post) (*pb.PostMessage, error) {
 	return &pb.PostMessage{
 		Id:          post.Id,

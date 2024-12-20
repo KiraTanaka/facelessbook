@@ -13,9 +13,11 @@ type postService struct {
 }
 
 type PostService interface {
-	Create(*models.Post) (string, error)
-	PostById(string) (*models.Post, error)
-	ListPosts() ([]*models.Post, error)
+	Create(post *models.Post) (postId string, err error)
+	PostById(postId string) (post *models.Post, err error)
+	ListPosts() (posts []*models.Post, err error)
+	Update(postId string, newText string) (text string, err error)
+	Delete(postId string) error
 }
 
 func PostToDTO(post *models.Post) models.PostDTO {

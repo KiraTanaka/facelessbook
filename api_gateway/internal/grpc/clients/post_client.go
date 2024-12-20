@@ -10,7 +10,6 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 
 	pb "github.com/KiraTanaka/facelessbook_protos/gen/post"
-	log "github.com/sirupsen/logrus"
 )
 
 type PostClient struct {
@@ -20,7 +19,7 @@ type PostClient struct {
 func NewPostClient(host string, port int) (*PostClient, error) {
 	conn, err := grpc.NewClient(fmt.Sprintf("%s:%d", host, port), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		log.Fatalf("did not connect to grpc server: %v", err)
+		return nil, err
 	}
 
 	postClient := pb.NewPostClient(conn)
@@ -38,7 +37,6 @@ func (c *PostClient) Create(post *models.Post) (string, error) {
 
 	r, err := c.Api.Create(ctx, &pb.CreateRequest{Post: postMessage})
 	if err != nil {
-		log.Error(err)
 		return "", err
 	}
 	return r.Id, nil
@@ -50,7 +48,6 @@ func (c *PostClient) PostById(postId string) (*models.Post, error) {
 
 	r, err := c.Api.PostById(ctx, &pb.PostByIdRequest{Id: postId})
 	if err != nil {
-		log.Error(err)
 		return nil, err
 	}
 
@@ -63,7 +60,6 @@ func (c *PostClient) ListPosts() ([]*models.Post, error) {
 
 	r, err := c.Api.ListPosts(ctx, &pb.ListPostsRequest{})
 	if err != nil {
-		log.Error(err)
 		return nil, err
 	}
 
@@ -78,10 +74,31 @@ func (c *PostClient) ListPosts() ([]*models.Post, error) {
 	return listPosts, nil
 }
 
+func (c *PostClient) Update(postId string, newText string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	_, err := c.Api.Update(ctx, &pb.UpdateRequest{Id: postId, Text: newText})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *PostClient) Delete(postId string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	_, err := c.Api.Delete(ctx, &pb.DeleteRequest{Id: postId})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func PostMessageToPostModel(postMessage *pb.PostMessage) (*models.Post, error) {
 	createdTime, err := time.Parse(time.DateTime, postMessage.CreatedTime)
 	if err != nil {
-		log.Error(err)
 		return nil, err
 	}
 

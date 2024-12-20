@@ -3,6 +3,8 @@ package http
 import (
 	"api_gateway/internal/models"
 	"api_gateway/internal/services"
+	"encoding/json"
+	"io"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -17,12 +19,14 @@ func InitPostHandler(routes *gin.RouterGroup, postService services.PostService) 
 	handler.postService = postService
 	postRoutes := routes.Group("/posts")
 	{
-		// POST
 		postRoutes.POST("/create", handler.Create)
 
-		//GET
 		postRoutes.GET("/", handler.ListPosts)
 		postRoutes.GET("/:postId", handler.PostById)
+
+		postRoutes.PUT("/:postId", handler.Update)
+
+		postRoutes.DELETE("/:postId", handler.Delete)
 
 	}
 
@@ -65,4 +69,37 @@ func (h *postHandler) ListPosts(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, posts)
+}
+
+func (h *postHandler) Update(c *gin.Context) {
+	postId := c.Param("postId")
+	bodyAsByteArray, err := io.ReadAll(c.Request.Body)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, "error")
+		return
+	}
+	jsonBody := make(map[string]string)
+	if err = json.Unmarshal(bodyAsByteArray, &jsonBody); err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, "error")
+		return
+	}
+
+	if err = h.postService.Update(postId, jsonBody["new_text"]); err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, "error")
+		return
+
+	}
+
+	c.JSON(http.StatusOK, "ok")
+}
+
+func (h *postHandler) Delete(c *gin.Context) {
+	postId := c.Param("postId")
+
+	if err := h.postService.Delete(postId); err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, "error")
+		return
+	}
+
+	c.JSON(http.StatusOK, "ok")
 }
