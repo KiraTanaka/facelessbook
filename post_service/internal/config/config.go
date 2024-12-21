@@ -5,17 +5,12 @@ import (
 	"time"
 
 	"github.com/ilyakaznacheev/cleanenv"
-	log "github.com/sirupsen/logrus"
 )
 
 type Config struct {
-	HttpConfig *HttpConfig
-	DbConfig   *DbConfig
-	GrpcConfig *GrpcConfig
-}
-
-type HttpConfig struct {
-	ServerAddress string `env:"HTTP_SERVER_ADDRESS" env-required:"true"`
+	DbConfig    *DbConfig
+	GrpcConfig  *GrpcConfig
+	KafkaConfig *KafkaConfig
 }
 
 type DbConfig struct {
@@ -27,31 +22,30 @@ type DbConfig struct {
 }
 
 type GrpcConfig struct {
-	GrpcHost    string        `env:"GRPC_HOST" env-required:"true"`
-	GrpcPort    int           `env:"GRPC_PORT" env-required:"true"`
-	GrpcTimeout time.Duration `env:"GRPC_TIMEOUT" env-required:"true"`
+	Port    int           `env:"GRPC_SERVER_PORT" env-required:"true"`
+	Timeout time.Duration `env:"GRPC_TIMEOUT" env-required:"true"`
+}
+type KafkaConfig struct {
+	Host string `env:"KAFKA_HOST" env-required:"true"`
+	Port int    `env:"KAFKA_POST" env-required:"true"`
 }
 
 func GetAppConfig() (*Config, error) {
-
-	log.Info("starting to read application config")
-
-	httpConfig := &HttpConfig{}
 	dbConfig := &DbConfig{}
 	grpcConfig := &GrpcConfig{}
-	if err := cleanenv.ReadConfig(".env", httpConfig); err != nil {
-		return nil, fmt.Errorf("read http config error: %w", err)
-	}
+	kafkaConfig := &KafkaConfig{}
 	if err := cleanenv.ReadConfig(".env", dbConfig); err != nil {
 		return nil, fmt.Errorf("read db config error: %w", err)
 	}
 	if err := cleanenv.ReadConfig(".env", grpcConfig); err != nil {
 		return nil, fmt.Errorf("read grpc config error: %w", err)
 	}
-	config := &Config{
-		HttpConfig: httpConfig,
-		DbConfig:   dbConfig,
-		GrpcConfig: grpcConfig}
+	if err := cleanenv.ReadConfig(".env", kafkaConfig); err != nil {
+		return nil, fmt.Errorf("read kafka config error: %w", err)
+	}
 
-	return config, nil
+	return &Config{
+		DbConfig:    dbConfig,
+		GrpcConfig:  grpcConfig,
+		KafkaConfig: kafkaConfig}, nil
 }

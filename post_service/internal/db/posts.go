@@ -46,18 +46,18 @@ func (r *Repository) CreatePost(post *models.Post) (string, error) {
 	return postId, nil
 }
 
-func (r *Repository) UpdatePost(postId string, newText string) (string, error) {
+func (r *Repository) UpdatePost(postId string, newText string) error {
 	tx, err := r.db.Beginx()
 	if err != nil {
-		return "", err
+		return err
 	}
 	defer tx.Rollback()
 	_, err = tx.Exec(updatePostQuery, postId, newText)
 	if err != nil {
-		return "", err
+		return err
 	}
 	tx.Commit()
-	return newText, nil
+	return nil
 }
 
 func (r *Repository) DeletePost(postId string) error {

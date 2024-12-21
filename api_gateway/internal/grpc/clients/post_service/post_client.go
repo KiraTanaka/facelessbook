@@ -1,13 +1,11 @@
-package grpc
+package post
 
 import (
 	"api_gateway/internal/models"
 	"context"
-	"fmt"
 	"time"
 
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 
 	pb "github.com/KiraTanaka/facelessbook_protos/gen/post"
 )
@@ -16,25 +14,19 @@ type PostClient struct {
 	Api pb.PostClient
 }
 
-func NewPostClient(host string, port int) (*PostClient, error) {
-	conn, err := grpc.NewClient(fmt.Sprintf("%s:%d", host, port), grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		return nil, err
-	}
-
+func NewPostClient(conn *grpc.ClientConn) (*PostClient, error) {
 	postClient := pb.NewPostClient(conn)
 
 	return &PostClient{Api: postClient}, nil
 }
 
 func (c *PostClient) Create(post *models.Post) (string, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 
-	postMessage := &pb.PostMessage{
+	postMessage := &pb.PostInformation{
 		AuthorId: post.AuthorId,
 		Text:     post.Text}
-
 	r, err := c.Api.Create(ctx, &pb.CreateRequest{Post: postMessage})
 	if err != nil {
 		return "", err
@@ -78,7 +70,7 @@ func (c *PostClient) Update(postId string, newText string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	_, err := c.Api.Update(ctx, &pb.UpdateRequest{Id: postId, Text: newText})
+	_, err := c.Api.Update(ctx, &pb.UpdateRequest{Id: postId, NewText: newText})
 	if err != nil {
 		return err
 	}
@@ -96,7 +88,7 @@ func (c *PostClient) Delete(postId string) error {
 	return nil
 }
 
-func PostMessageToPostModel(postMessage *pb.PostMessage) (*models.Post, error) {
+func PostMessageToPostModel(postMessage *pb.PostInformation) (*models.Post, error) {
 	createdTime, err := time.Parse(time.DateTime, postMessage.CreatedTime)
 	if err != nil {
 		return nil, err

@@ -58,7 +58,7 @@ func (s *postServer) ListPosts(ctx context.Context, request *pb.ListPostsRequest
 		return nil, status.Error(codes.Internal, "failed find list posts")
 	}
 
-	postMessages := []*pb.PostMessage{}
+	postMessages := []*pb.PostInformation{}
 
 	for _, post := range posts {
 		postMessage, _ := PostModelToPostMessage(post)
@@ -69,12 +69,12 @@ func (s *postServer) ListPosts(ctx context.Context, request *pb.ListPostsRequest
 }
 
 func (s *postServer) Update(ctx context.Context, request *pb.UpdateRequest) (*pb.UpdateResponse, error) {
-	newText, err := s.postService.Update(request.Id, request.Text)
+	err := s.postService.Update(request.Id, request.NewText)
 	if err != nil {
 		return nil, status.Error(codes.Internal, "failed create")
 	}
 
-	return &pb.UpdateResponse{NewText: newText}, nil
+	return &pb.UpdateResponse{}, nil
 }
 
 func (s *postServer) Delete(ctx context.Context, request *pb.DeleteRequest) (*pb.DeleteResponse, error) {
@@ -86,8 +86,8 @@ func (s *postServer) Delete(ctx context.Context, request *pb.DeleteRequest) (*pb
 	return &pb.DeleteResponse{}, nil
 }
 
-func PostModelToPostMessage(post *models.Post) (*pb.PostMessage, error) {
-	return &pb.PostMessage{
+func PostModelToPostMessage(post *models.Post) (*pb.PostInformation, error) {
+	return &pb.PostInformation{
 		Id:          post.Id,
 		CreatedTime: post.CreatedTime.Format(time.DateTime),
 		AuthorId:    post.AuthorId,

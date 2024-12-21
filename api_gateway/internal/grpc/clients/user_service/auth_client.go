@@ -1,12 +1,10 @@
-package grpc
+package user
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 
 	auth "github.com/KiraTanaka/facelessbook_protos/gen/auth"
 	log "github.com/sirupsen/logrus"
@@ -16,15 +14,11 @@ type AuthClient struct {
 	Api auth.AuthClient
 }
 
-func NewAuthClient(host string, port int) (*AuthClient, error) {
-	conn, err := grpc.NewClient(fmt.Sprintf("%s:%d", host, port), grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		log.Fatalf("did not connect to grpc server: %v", err)
-	}
+func NewAuthClient(conn *grpc.ClientConn) (*AuthClient, error) {
 
-	authClient := auth.NewAuthClient(conn)
+	client := auth.NewAuthClient(conn)
 
-	return &AuthClient{Api: authClient}, nil
+	return &AuthClient{Api: client}, nil
 }
 
 func (c *AuthClient) Register(phone string, password string) (string, error) {

@@ -1,4 +1,4 @@
-package server_grpc
+package grpc
 
 import (
 	"context"
@@ -9,19 +9,19 @@ import (
 
 	"user_service/internal/services"
 
-	auth "github.com/KiraTanaka/facelessbook_protos/gen/auth"
+	pb "github.com/KiraTanaka/facelessbook_protos/gen/auth"
 )
 
-type serverAuth struct {
-	auth.UnimplementedAuthServer
+type authServer struct {
+	pb.UnimplementedAuthServer
 	authService services.AuthService
 }
 
 func RegisterAuthServer(gRPCServer *grpc.Server, authService services.AuthService) {
-	auth.RegisterAuthServer(gRPCServer, &serverAuth{authService: authService})
+	pb.RegisterAuthServer(gRPCServer, &authServer{authService: authService})
 }
 
-func (s *serverAuth) Register(ctx context.Context, request *auth.RegisterRequest) (*auth.RegisterResponse, error) {
+func (s *authServer) Register(ctx context.Context, request *pb.RegisterRequest) (*pb.RegisterResponse, error) {
 	if err := validateRegistrationData(request); err != nil {
 		return nil, err
 	}
@@ -31,10 +31,10 @@ func (s *serverAuth) Register(ctx context.Context, request *auth.RegisterRequest
 		return nil, status.Error(codes.Internal, "failed register")
 	}
 
-	return &auth.RegisterResponse{UserId: userId}, nil
+	return &pb.RegisterResponse{UserId: userId}, nil
 }
 
-func (s *serverAuth) Login(ctx context.Context, request *auth.LoginRequest) (*auth.LoginResponse, error) {
+func (s *authServer) Login(ctx context.Context, request *pb.LoginRequest) (*pb.LoginResponse, error) {
 	if err := validateLoginData(request); err != nil {
 		return nil, err
 	}
@@ -45,10 +45,10 @@ func (s *serverAuth) Login(ctx context.Context, request *auth.LoginRequest) (*au
 
 	}
 
-	return &auth.LoginResponse{Token: token}, nil
+	return &pb.LoginResponse{Token: token}, nil
 }
 
-func validateRegistrationData(request *auth.RegisterRequest) error {
+func validateRegistrationData(request *pb.RegisterRequest) error {
 	if request.GetPhone() == "" {
 		return status.Error(codes.InvalidArgument, "phone is required")
 	}
@@ -59,7 +59,7 @@ func validateRegistrationData(request *auth.RegisterRequest) error {
 
 }
 
-func validateLoginData(request *auth.LoginRequest) error {
+func validateLoginData(request *pb.LoginRequest) error {
 	if request.GetPhone() == "" {
 		return status.Error(codes.InvalidArgument, "phone is required")
 	}

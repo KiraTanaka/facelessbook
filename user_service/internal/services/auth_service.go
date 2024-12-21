@@ -2,6 +2,7 @@ package services
 
 import (
 	"time"
+	"user_service/internal/config"
 	"user_service/internal/db"
 	"user_service/internal/jwt"
 
@@ -19,18 +20,17 @@ type AuthService interface {
 	Login(phone string, password string) (toker string, err error)
 }
 
-func NewAuthService(repository *db.Repository, tokenTTL time.Duration) (AuthService, error) {
+func NewAuthService(repository *db.Repository, tokenConfig *config.TokenConfig) AuthService {
 	return &authService{
 		repository: repository,
-		tokenTTL:   tokenTTL,
-	}, nil
+		tokenTTL:   tokenConfig.Token_TTL,
+	}
 }
 
 func (s *authService) Register(phone string, password string) (string, error) {
 
 	passHash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
-
 		log.Error(err)
 		return "", err
 	}
@@ -38,7 +38,6 @@ func (s *authService) Register(phone string, password string) (string, error) {
 	userId, err := s.repository.CreateUser(phone, passHash)
 
 	if err != nil {
-
 		log.Error(err)
 		return "", err
 	}
@@ -50,7 +49,6 @@ func (s *authService) Login(phone string, password string) (string, error) {
 	user, err := s.repository.User(phone)
 
 	if err != nil {
-
 		log.Error(err)
 		return "", err
 	}
@@ -62,7 +60,6 @@ func (s *authService) Login(phone string, password string) (string, error) {
 
 	token, err := jwt.NewToken(user, s.tokenTTL)
 	if err != nil {
-
 		log.Error(err)
 		return "", err
 	}

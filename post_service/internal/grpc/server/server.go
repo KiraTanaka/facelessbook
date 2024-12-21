@@ -22,7 +22,7 @@ func NewServer(config *config.GrpcConfig, services *services.Services) *Server {
 
 	return &Server{
 		grpcServer: grpcServer,
-		port:       config.GrpcPort,
+		port:       config.Port,
 	}
 }
 

@@ -11,6 +11,9 @@ var createUserQuery string
 //go:embed queries/user/getUser.sql
 var getUserQuery string
 
+//go:embed queries/user/getNickname.sql
+var getNicknameQuery string
+
 func (r *Repository) CreateUser(phone string, passHash []byte) (string, error) {
 	var userId string
 	tx, err := r.db.Beginx()
@@ -27,6 +30,16 @@ func (r *Repository) CreateUser(phone string, passHash []byte) (string, error) {
 }
 func (r *Repository) User(phone string) (*models.User, error) {
 	user := &models.User{}
-	err := r.db.Get(user, getUserQuery, phone)
-	return user, err
+	if err := r.db.Get(user, getUserQuery, phone); err != nil {
+		return nil, err
+	}
+	return user, nil
+}
+
+func (r *Repository) Nickname(userId string) (string, error) {
+	var nick string
+	if err := r.db.Get(&nick, getNicknameQuery, userId); err != nil {
+		return "", err
+	}
+	return nick, nil
 }

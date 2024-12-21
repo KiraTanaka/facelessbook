@@ -1,6 +1,7 @@
 package app
 
 import (
+	"post_service/internal/broker"
 	"post_service/internal/config"
 	"post_service/internal/db"
 	grpc "post_service/internal/grpc/server"
@@ -22,6 +23,7 @@ func New() (*App, error) {
 		log.Error(err)
 		return nil, err
 	}
+	log.Info("Finished reading the configuration.")
 
 	repository, err := db.NewConnect(config.DbConfig)
 	if err != nil {
@@ -29,7 +31,9 @@ func New() (*App, error) {
 		return nil, err
 	}
 
-	services, err := services.Init(repository)
+	writer := broker.NewConnect()
+
+	services, err := services.Init(repository, writer)
 	if err != nil {
 		log.Error(err)
 		return nil, err
