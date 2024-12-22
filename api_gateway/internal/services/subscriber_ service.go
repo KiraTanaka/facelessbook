@@ -1,28 +1,28 @@
 package services
 
 import (
-	"user_service/internal/db"
+	grpc "api_gateway/internal/grpc/clients/user_service"
 
 	log "github.com/sirupsen/logrus"
 )
 
 type subscriberService struct {
-	repository *db.Repository
+	grpcClient *grpc.SubscriberClient
 }
 
 type SubscriberService interface {
 	Subscribe(publisher_id, subscriber_id string) error
 	Unsubscribe(publisher_id, subscriber_id string) error
-	ListSubscribers(publisherId string) ([]string, error)
+	ListSubscribers(publisher_id string) ([]string, error)
 }
 
-func NewSubscriberService(repository *db.Repository) SubscriberService {
+func NewSubscriberService(grpcClient *grpc.SubscriberClient) SubscriberService {
 	return &subscriberService{
-		repository: repository}
+		grpcClient: grpcClient}
 }
 
 func (s *subscriberService) Subscribe(publisher_id, subscriber_id string) error {
-	err := s.repository.Subscribe(publisher_id, subscriber_id)
+	err := s.grpcClient.Subscribe(publisher_id, subscriber_id)
 	if err != nil {
 		log.Error(err)
 		return err
@@ -32,7 +32,7 @@ func (s *subscriberService) Subscribe(publisher_id, subscriber_id string) error 
 }
 
 func (s *subscriberService) Unsubscribe(publisher_id, subscriber_id string) error {
-	err := s.repository.Unsubscribe(publisher_id, subscriber_id)
+	err := s.grpcClient.Unsubscribe(publisher_id, subscriber_id)
 	if err != nil {
 		log.Error(err)
 		return err
@@ -41,12 +41,12 @@ func (s *subscriberService) Unsubscribe(publisher_id, subscriber_id string) erro
 	return nil
 }
 
-func (s *subscriberService) ListSubscribers(publisherId string) ([]string, error) {
-	subscriberIds, err := s.repository.ListSubscribers(publisherId)
+func (s *subscriberService) ListSubscribers(publisher_id string) ([]string, error) {
+	subscribers, err := s.grpcClient.ListSubscribers(publisher_id)
 	if err != nil {
 		log.Error(err)
 		return nil, err
 	}
 
-	return subscriberIds, err
+	return subscribers, nil
 }

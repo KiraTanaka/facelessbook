@@ -11,9 +11,10 @@ import (
 )
 
 type Clients struct {
-	Auth *user.AuthClient
-	User *user.UserClient
-	Post *post.PostClient
+	Auth       *user.AuthClient
+	User       *user.UserClient
+	Subscriber *user.SubscriberClient
+	Post       *post.PostClient
 }
 
 func NewClients(config *config.GrpcConfig) (*Clients, error) {
@@ -38,6 +39,7 @@ func (c *Clients) NewUserServiceClients(config *config.GrpcConfig) error {
 
 	c.Auth = user.NewAuthClient(conn, config.Timeout)
 	c.User = user.NewUserClient(conn, config.Timeout)
+	c.Subscriber = user.NewSubscriberClient(conn, config.Timeout)
 
 	return nil
 }

@@ -78,9 +78,11 @@ func (c *PostClient) Update(postId string, newText string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), c.Timeout)
 	defer cancel()
 
-	_, err := c.Api.Update(ctx, &pb.UpdateRequest{Id: postId, NewText: newText})
+	r, err := c.Api.Update(ctx, &pb.UpdateRequest{Id: postId, NewText: newText})
 	if err != nil {
 		return fmt.Errorf("update post: %w", err)
+	} else if !r.Success {
+		return fmt.Errorf("update ended unsuccessfully")
 	}
 	return nil
 }
@@ -89,9 +91,11 @@ func (c *PostClient) Delete(postId string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), c.Timeout)
 	defer cancel()
 
-	_, err := c.Api.Delete(ctx, &pb.DeleteRequest{Id: postId})
+	r, err := c.Api.Delete(ctx, &pb.DeleteRequest{Id: postId})
 	if err != nil {
 		return fmt.Errorf("delete post: %w", err)
+	} else if !r.Success {
+		return fmt.Errorf("delete ended unsuccessfully")
 	}
 	return nil
 }

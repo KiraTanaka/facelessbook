@@ -13,7 +13,7 @@ type authHandler struct {
 	authService services.AuthService
 }
 
-func InitAuthHandler(routes *gin.RouterGroup, authService services.AuthService) {
+func NewAuthHandler(routes *gin.RouterGroup, authService services.AuthService) {
 	authHandler := &authHandler{}
 	authHandler.authService = authService
 	authRoutes := routes.Group("/users")

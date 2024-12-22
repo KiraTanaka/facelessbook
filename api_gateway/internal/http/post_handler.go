@@ -3,8 +3,6 @@ package http
 import (
 	"api_gateway/internal/models"
 	"api_gateway/internal/services"
-	"encoding/json"
-	"io"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -14,7 +12,7 @@ type postHandler struct {
 	postService services.PostService
 }
 
-func InitPostHandler(routes *gin.RouterGroup, postService services.PostService) {
+func NewPostHandler(routes *gin.RouterGroup, postService services.PostService) {
 	handler := &postHandler{}
 	handler.postService = postService
 	postRoutes := routes.Group("/posts")
@@ -79,19 +77,13 @@ func (h *postHandler) Update(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, "указание ид поста обязательно")
 	}
 
-	bodyAsByteArray, err := io.ReadAll(c.Request.Body)
+	jsonBody, err := ReadBody(c.Request)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, "недопустимое тело запроса для редактирования поста")
+		c.AbortWithStatusJSON(http.StatusBadRequest, err)
 		return
 	}
 
-	jsonBody := make(map[string]string)
-	if err = json.Unmarshal(bodyAsByteArray, &jsonBody); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, "неудалось обработать входные данные для редактирования поста")
-		return
-	}
-
-	if err = h.postService.Update(postId, jsonBody["new_text"]); err != nil {
+	if err = h.postService.Update(postId, jsonBody["text"]); err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, "неудалось отредактировать пост")
 		return
 

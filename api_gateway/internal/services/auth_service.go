@@ -27,7 +27,7 @@ func (s *authService) Register(phone string, password string) (string, error) {
 		return "", err
 	}
 
-	return userId, err
+	return userId, nil
 }
 
 func (s *authService) Login(phone string, password string) (string, error) {
@@ -37,5 +37,5 @@ func (s *authService) Login(phone string, password string) (string, error) {
 		return "", err
 	}
 
-	return token, err
+	return token, nil
 }
