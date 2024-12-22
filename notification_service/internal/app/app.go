@@ -39,15 +39,11 @@ func New() (*App, error) {
 	}
 	log.Info("Created the new GRPC clients.")
 
-	services, err := services.New(repository, grpcClients)
-	if err != nil {
-		log.Error(err)
-		return nil, err
-	}
+	services := services.New(repository, grpcClients)
 	log.Info("Services have been initialized.")
 
 	brokerReaders := broker.NewConnect(config.KafkaConfig, services)
-	log.Info("Connected to the broker.")
+	log.Info("Created the readers for the broker.")
 
 	//grpcServer := grpc.NewServer(config.GrpcConfig, services)
 

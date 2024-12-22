@@ -7,8 +7,6 @@ import (
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-
-	log "github.com/sirupsen/logrus"
 )
 
 type Clients struct {
@@ -20,7 +18,6 @@ func NewClients(config *config.GrpcConfig) (*Clients, error) {
 	clients := &Clients{}
 	err := clients.NewUserServiceClients(config)
 	if err != nil {
-		log.Error(err)
 		return nil, err
 	}
 
@@ -28,9 +25,9 @@ func NewClients(config *config.GrpcConfig) (*Clients, error) {
 }
 
 func (c *Clients) NewUserServiceClients(config *config.GrpcConfig) error {
-	conn, err := grpc.NewClient(fmt.Sprintf("%s:%d", config.GrpcUserHost, config.GrpcUserPort), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient(fmt.Sprintf("%s:%d", config.UserHost, config.UserPort), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		log.Fatalf("did not connect to grpc server: %v", err)
+		return fmt.Errorf("new user grpc clients: %v", err)
 	}
 
 	c.User = user.NewUserClient(conn, config.Timeout)

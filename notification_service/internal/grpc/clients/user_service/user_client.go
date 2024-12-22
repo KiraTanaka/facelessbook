@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"google.golang.org/grpc"
@@ -15,8 +16,9 @@ type UserClient struct {
 }
 
 func NewUserClient(conn *grpc.ClientConn, timeout time.Duration) *UserClient {
+	client := pb.NewUserClient(conn)
 	return &UserClient{
-		Api:     pb.NewUserClient(conn),
+		Api:     client,
 		Timeout: timeout}
 }
 
@@ -25,7 +27,7 @@ func (c *UserClient) Nickname(userId string) (string, error) {
 	defer cancel()
 	r, err := c.Api.NickName(ctx, &pb.NickNameRequest{Id: userId})
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("get nickname: %v", err)
 	}
 	return r.Nickname, nil
 }

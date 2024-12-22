@@ -9,18 +9,12 @@ type Services struct {
 	Post PostService
 }
 
-func Init(grpcClients *grpc.Clients) (*Services, error) {
-	auth, err := NewAuthService(grpcClients.Auth)
-	if err != nil {
-		return nil, err
-	}
-	post, err := NewPostService(grpcClients.Post)
-	if err != nil {
-		return nil, err
-	}
+func New(grpcClients *grpc.Clients) *Services {
+	auth := NewAuthService(grpcClients.Auth)
+	post := NewPostService(grpcClients.Post)
 
 	return &Services{
 		Auth: auth,
 		Post: post,
-	}, nil
+	}
 }

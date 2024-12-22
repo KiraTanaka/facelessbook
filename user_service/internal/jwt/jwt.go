@@ -1,6 +1,7 @@
 package jwt
 
 import (
+	"fmt"
 	"time"
 	"user_service/internal/models"
 
@@ -17,7 +18,7 @@ func NewToken(user *models.User, duration time.Duration) (string, error) {
 
 	tokenStr, err := token.SignedString([]byte("secret"))
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("get token: %w", err)
 	}
 
 	return tokenStr, nil

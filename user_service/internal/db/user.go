@@ -2,6 +2,7 @@ package db
 
 import (
 	_ "embed"
+	"fmt"
 	"user_service/internal/models"
 )
 
@@ -18,12 +19,12 @@ func (r *Repository) CreateUser(phone string, passHash []byte) (string, error) {
 	var userId string
 	tx, err := r.db.Beginx()
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("begin a transaction for create user: %w", err)
 	}
 	defer tx.Rollback()
 	err = tx.QueryRow(createUserQuery, phone, passHash).Scan(&userId)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("create user: %w", err)
 	}
 	tx.Commit()
 	return userId, nil
@@ -31,7 +32,7 @@ func (r *Repository) CreateUser(phone string, passHash []byte) (string, error) {
 func (r *Repository) User(phone string) (*models.User, error) {
 	user := &models.User{}
 	if err := r.db.Get(user, getUserQuery, phone); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get user: %w", err)
 	}
 	return user, nil
 }
@@ -39,7 +40,7 @@ func (r *Repository) User(phone string) (*models.User, error) {
 func (r *Repository) Nickname(userId string) (string, error) {
 	var nick string
 	if err := r.db.Get(&nick, getNicknameQuery, userId); err != nil {
-		return "", err
+		return "", fmt.Errorf("get nickname: %w", err)
 	}
 	return nick, nil
 }

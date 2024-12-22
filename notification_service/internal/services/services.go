@@ -10,19 +10,11 @@ type Services struct {
 	Push                PushService
 }
 
-func New(repository *db.Repository, grpcClients *grpc.Clients) (*Services, error) {
-	pushService, err := NewPushService(repository)
-	if err != nil {
-		return nil, err
-	}
-
-	notificationService, err := NewNotificationService(pushService, grpcClients.User, grpcClients.Subscriber)
-	if err != nil {
-		return nil, err
-	}
+func New(repository *db.Repository, grpcClients *grpc.Clients) *Services {
+	pushService := NewPushService(repository)
+	notificationService := NewNotificationService(pushService, grpcClients.User, grpcClients.Subscriber)
 
 	return &Services{
 		NotificationService: notificationService,
-		Push:                pushService,
-	}, nil
+		Push:                pushService}
 }

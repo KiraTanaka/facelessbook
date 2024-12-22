@@ -31,11 +31,11 @@ func PostToDTO(post *models.Post) models.PostDTO {
 	}
 }
 
-func NewPostService(repository *db.Repository, writer broker.Writer) (PostService, error) {
+func NewPostService(repository *db.Repository, writer broker.Writer) PostService {
 	return &postService{
 		repository: repository,
 		writer:     writer,
-	}, nil
+	}
 
 }
 
@@ -46,7 +46,7 @@ func (s *postService) Create(post *models.Post) (string, error) {
 		return "", err
 	}
 
-	if err = s.writer.SendMessage(&broker.NewPostMessage{AuthorId: post.AuthorId}); err != nil {
+	if err = s.writer.SendMessage(&models.NewPostMessage{AuthorId: post.AuthorId}); err != nil {
 		log.Error(err)
 	}
 	return postId, nil

@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func InitRoutes(services *services.Services) *gin.Engine {
+func NewRoutes(services *services.Services) *gin.Engine {
 	routes := gin.Default()
 	routes.GET("/", hello)
 	routeGroup := routes.Group("/api")

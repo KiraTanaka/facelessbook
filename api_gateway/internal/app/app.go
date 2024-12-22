@@ -10,41 +10,37 @@ import (
 )
 
 type App struct {
-	config      *config.Config
-	httpServer  *http.Server
-	services    *services.Services
-	grpcClients *grpc.Clients
+	config     *config.Config
+	httpServer *http.Server
+	services   *services.Services
 }
 
 func New() (*App, error) {
-	app := &App{}
-
-	var err error
-	app.config, err = config.GetAppConfig()
+	config, err := config.GetAppConfig()
 	if err != nil {
 		log.Error(err)
 		return nil, err
 	}
+	log.Info("Finished reading the configuration.")
 
-	app.grpcClients, err = grpc.NewClients(app.config.GrpcConfig)
+	grpcClients, err := grpc.NewClients(config.GrpcConfig)
 	if err != nil {
 		log.Error(err)
 		return nil, err
 	}
+	log.Info("Created the new GRPC clients.")
 
-	app.services, err = services.Init(app.grpcClients)
-	if err != nil {
-		log.Error(err)
-		return nil, err
-	}
+	services := services.New(grpcClients)
+	log.Info("Services have been initialized.")
 
-	app.httpServer, err = http.NewServer(app.config.HttpConfig, app.services)
-	if err != nil {
-		log.Error(err)
-		return nil, err
-	}
+	httpServer := http.NewServer(config.HttpConfig, services)
+	log.Info("Created the new http server.")
 
-	return app, nil
+	return &App{
+		config:     config,
+		services:   services,
+		httpServer: httpServer,
+	}, nil
 }
 
 func (app *App) Run() {

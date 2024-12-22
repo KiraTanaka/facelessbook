@@ -30,22 +30,16 @@ func New() (*App, error) {
 		log.Error(err)
 		return nil, err
 	}
+	log.Info("Connected to the database.")
 
-	writer := broker.NewConnect()
+	writer := broker.NewConnect(config.KafkaConfig)
+	log.Info("Created the writers for the broker.")
 
-	services, err := services.Init(repository, writer)
-	if err != nil {
-		log.Error(err)
-		return nil, err
-	}
-
-	/*app.httpServer, err = http.NewServer(app.config.HttpConfig, app.services)
-	if err != nil {
-		log.Error(err)
-		return nil, err
-	}*/
+	services := services.New(repository, writer)
+	log.Info("Created services.")
 
 	grpcServer := grpc.NewServer(config.GrpcConfig, services)
+	log.Info("Registered the GRPC server.")
 
 	return &App{
 		config:     config,

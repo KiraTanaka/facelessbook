@@ -21,7 +21,6 @@ func NewUserService(repository *db.Repository) UserService {
 
 func (s *userService) Nickname(userId string) (string, error) {
 	nick, err := s.repository.Nickname(userId)
-
 	if err != nil {
 		log.Error(err)
 		return "", err

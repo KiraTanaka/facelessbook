@@ -2,6 +2,7 @@ package db
 
 import (
 	_ "embed"
+	"fmt"
 	"post_service/internal/models"
 )
 
@@ -22,25 +23,28 @@ var deletePostQuery string
 
 func (r *Repository) ListPosts() ([]*models.Post, error) {
 	posts := []*models.Post{}
-	err := r.db.Select(&posts, getListPostsQuery)
-	return posts, err
+	if err := r.db.Select(&posts, getListPostsQuery); err != nil {
+		return nil, fmt.Errorf("select list posts: %w", err)
+	}
+	return posts, nil
 }
 func (r *Repository) PostById(postId string) (*models.Post, error) {
 	post := &models.Post{}
-	err := r.db.Get(post, getPostQuery, postId)
-	return post, err
+	if err := r.db.Get(post, getPostQuery, postId); err != nil {
+		return nil, fmt.Errorf("get post by id: %w", err)
+	}
+	return post, nil
 }
 
 func (r *Repository) CreatePost(post *models.Post) (string, error) {
 	var postId string
 	tx, err := r.db.Beginx()
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("begin a transaction for create post: %w", err)
 	}
 	defer tx.Rollback()
-	err = tx.QueryRow(createPostQuery, post.AuthorId, post.Text).Scan(&postId)
-	if err != nil {
-		return "", err
+	if err = tx.QueryRow(createPostQuery, post.AuthorId, post.Text).Scan(&postId); err != nil {
+		return "", fmt.Errorf("create post: %w", err)
 	}
 	tx.Commit()
 	return postId, nil
@@ -49,12 +53,11 @@ func (r *Repository) CreatePost(post *models.Post) (string, error) {
 func (r *Repository) UpdatePost(postId string, newText string) error {
 	tx, err := r.db.Beginx()
 	if err != nil {
-		return err
+		return fmt.Errorf("begin a transaction for update post: %w", err)
 	}
 	defer tx.Rollback()
-	_, err = tx.Exec(updatePostQuery, postId, newText)
-	if err != nil {
-		return err
+	if _, err = tx.Exec(updatePostQuery, postId, newText); err != nil {
+		return fmt.Errorf("update post: %w", err)
 	}
 	tx.Commit()
 	return nil
@@ -63,12 +66,11 @@ func (r *Repository) UpdatePost(postId string, newText string) error {
 func (r *Repository) DeletePost(postId string) error {
 	tx, err := r.db.Beginx()
 	if err != nil {
-		return err
+		return fmt.Errorf("begin a transaction for delete post: %w", err)
 	}
 	defer tx.Rollback()
-	_, err = tx.Exec(deletePostQuery, postId)
-	if err != nil {
-		return err
+	if _, err = tx.Exec(deletePostQuery, postId); err != nil {
+		return fmt.Errorf("delete post: %w", err)
 	}
 	tx.Commit()
 	return nil

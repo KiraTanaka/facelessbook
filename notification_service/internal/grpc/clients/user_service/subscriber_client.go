@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"google.golang.org/grpc"
@@ -15,8 +16,10 @@ type SubscriberClient struct {
 }
 
 func NewSubscriberClient(conn *grpc.ClientConn, timeout time.Duration) *SubscriberClient {
+	client := pb.NewSubscriberClient(conn)
+
 	return &SubscriberClient{
-		Api:     pb.NewSubscriberClient(conn),
+		Api:     client,
 		Timeout: timeout}
 }
 
@@ -25,7 +28,7 @@ func (c *SubscriberClient) ListSubscribers(publisherId string) ([]string, error)
 	defer cancel()
 	r, err := c.Api.ListSubscribers(ctx, &pb.ListSubscribersRequest{PublisherId: publisherId})
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get list of subscribers: %v", err)
 	}
 	return r.Subscribers, nil
 }

@@ -19,10 +19,9 @@ type PostService interface {
 	Delete(postId string) (err error)
 }
 
-func NewPostService(grpcClient *grpc.PostClient) (PostService, error) {
+func NewPostService(grpcClient *grpc.PostClient) PostService {
 	return &postService{
-		grpcClient: grpcClient,
-	}, nil
+		grpcClient: grpcClient}
 }
 
 func (s *postService) Create(post *models.Post) (string, error) {

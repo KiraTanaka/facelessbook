@@ -5,6 +5,7 @@ import (
 	"api_gateway/internal/services"
 
 	"github.com/gin-gonic/gin"
+	log "github.com/sirupsen/logrus"
 )
 
 type Server struct {
@@ -12,14 +13,15 @@ type Server struct {
 	routes *gin.Engine
 }
 
-func NewServer(config *config.HttpConfig, services *services.Services) (*Server, error) {
+func NewServer(config *config.HttpConfig, services *services.Services) *Server {
 	server := &Server{config: config}
 
-	server.routes = InitRoutes(services)
+	server.routes = NewRoutes(services)
 
-	return server, nil
+	return server
 }
 
 func (s *Server) Run() {
+	log.Info("Runs http server.")
 	s.routes.Run(s.config.ServerAddress)
 }

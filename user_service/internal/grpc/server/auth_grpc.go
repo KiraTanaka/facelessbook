@@ -26,9 +26,9 @@ func (s *authServer) Register(ctx context.Context, request *pb.RegisterRequest) 
 		return nil, err
 	}
 
-	userId, err := s.authService.Register(request.GetPhone(), request.GetPassword())
+	userId, err := s.authService.Register(request.Phone, request.Password)
 	if err != nil {
-		return nil, status.Error(codes.Internal, "failed register")
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 
 	return &pb.RegisterResponse{UserId: userId}, nil
@@ -39,9 +39,9 @@ func (s *authServer) Login(ctx context.Context, request *pb.LoginRequest) (*pb.L
 		return nil, err
 	}
 
-	token, err := s.authService.Login(request.GetPhone(), request.GetPassword())
+	token, err := s.authService.Login(request.Phone, request.Password)
 	if err != nil {
-		return nil, status.Error(codes.Internal, "failed login")
+		return nil, status.Error(codes.Internal, err.Error())
 
 	}
 
@@ -49,10 +49,10 @@ func (s *authServer) Login(ctx context.Context, request *pb.LoginRequest) (*pb.L
 }
 
 func validateRegistrationData(request *pb.RegisterRequest) error {
-	if request.GetPhone() == "" {
+	if request.Phone == "" {
 		return status.Error(codes.InvalidArgument, "phone is required")
 	}
-	if request.GetPassword() == "" {
+	if request.Password == "" {
 		return status.Error(codes.InvalidArgument, "password is required")
 	}
 	return nil
@@ -60,10 +60,10 @@ func validateRegistrationData(request *pb.RegisterRequest) error {
 }
 
 func validateLoginData(request *pb.LoginRequest) error {
-	if request.GetPhone() == "" {
+	if request.Phone == "" {
 		return status.Error(codes.InvalidArgument, "phone is required")
 	}
-	if request.GetPassword() == "" {
+	if request.Password == "" {
 		return status.Error(codes.InvalidArgument, "password is required")
 	}
 	return nil

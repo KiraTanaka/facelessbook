@@ -2,8 +2,10 @@ package broker
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"notification_service/internal/config"
+	"notification_service/internal/models"
 	"notification_service/internal/services"
 
 	"github.com/segmentio/kafka-go"
@@ -11,7 +13,7 @@ import (
 )
 
 type PostReader struct {
-	kafka               *kafka.Reader
+	broker              *kafka.Reader
 	notificationService services.NotificationService
 }
 
@@ -21,7 +23,7 @@ type Reader interface {
 
 func NewPostReader(config *config.KafkaConfig, notificationService services.NotificationService) *PostReader {
 	return &PostReader{
-		kafka: kafka.NewReader(kafka.ReaderConfig{
+		broker: kafka.NewReader(kafka.ReaderConfig{
 			Brokers:   []string{fmt.Sprintf("%s:%d", config.Host, config.Port)},
 			Topic:     "posts",
 			Partition: 0,
@@ -31,17 +33,30 @@ func NewPostReader(config *config.KafkaConfig, notificationService services.Noti
 }
 
 func (r *PostReader) Run() {
+	log.Info("Runs post reader.")
 	for {
-		kafkaMessage, err := r.kafka.ReadMessage(context.Background())
+		brokerMessage, err := r.broker.ReadMessage(context.Background())
 		if err != nil {
-			log.Error(err)
+			log.Error(fmt.Errorf("broker read message about new post: %w", err))
 			return
 		}
-		message, err := ToNewPostMessage(kafkaMessage.Value)
+		message, err := NewPostMessage(brokerMessage.Value)
 		if err != nil {
-			log.Error(err)
+			log.Error(fmt.Errorf("new post message: %w", err))
 			continue
 		}
-		r.notificationService.ProcessNewPost(message)
+		if err = r.notificationService.ProcessNewPost(message); err != nil {
+			log.Error(fmt.Errorf("process new post: %w", err))
+			continue
+		}
 	}
+}
+
+func NewPostMessage(value []byte) (*models.NewPostMessage, error) {
+	message := &models.NewPostMessage{}
+	err := json.Unmarshal(value, message)
+	if err != nil {
+		return nil, err
+	}
+	return message, nil
 }

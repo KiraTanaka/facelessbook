@@ -9,13 +9,10 @@ type Services struct {
 	Post PostService
 }
 
-func Init(repository *db.Repository, writer broker.Writer) (*Services, error) {
-	postService, err := NewPostService(repository, writer)
-	if err != nil {
-		return nil, err
-	}
+func New(repository *db.Repository, writer broker.Writer) *Services {
+	postService := NewPostService(repository, writer)
 
 	return &Services{
 		Post: postService,
-	}, nil
+	}
 }

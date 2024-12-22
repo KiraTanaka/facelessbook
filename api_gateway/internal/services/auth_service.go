@@ -15,14 +15,12 @@ type AuthService interface {
 	Login(phone string, password string) (toker string, err error)
 }
 
-func NewAuthService(grpcClient *grpc.AuthClient) (AuthService, error) {
+func NewAuthService(grpcClient *grpc.AuthClient) AuthService {
 	return &authService{
-		grpcClient: grpcClient,
-	}, nil
+		grpcClient: grpcClient}
 }
 
 func (s *authService) Register(phone string, password string) (string, error) {
-
 	userId, err := s.grpcClient.Register(phone, password)
 	if err != nil {
 		log.Error(err)

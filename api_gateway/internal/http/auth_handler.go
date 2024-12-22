@@ -29,16 +29,17 @@ func InitAuthHandler(routes *gin.RouterGroup, authService services.AuthService) 
 func (h *authHandler) Register(c *gin.Context) {
 	bodyAsByteArray, err := io.ReadAll(c.Request.Body)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, "error")
+		c.AbortWithStatusJSON(http.StatusBadRequest, "недопустимое тело запроса для регистрации")
 	}
+
 	jsonBody := make(map[string]string)
 	if err = json.Unmarshal(bodyAsByteArray, &jsonBody); err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, "error")
+		c.AbortWithStatusJSON(http.StatusBadRequest, "неудалось обработать входные данные для регистрации")
 	}
-	userId, err := h.authService.Register(jsonBody["phone"], jsonBody["password"])
 
+	userId, err := h.authService.Register(jsonBody["phone"], jsonBody["password"])
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, "error")
+		c.AbortWithStatusJSON(http.StatusInternalServerError, "неудалось зарегистрировать пользователя")
 	}
 
 	c.JSON(http.StatusOK, userId)
@@ -47,16 +48,17 @@ func (h *authHandler) Register(c *gin.Context) {
 func (h *authHandler) Login(c *gin.Context) {
 	bodyAsByteArray, err := io.ReadAll(c.Request.Body)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, "error")
+		c.AbortWithStatusJSON(http.StatusBadRequest, "недопустимое тело запроса для входа")
 	}
+
 	jsonBody := make(map[string]string)
 	if err = json.Unmarshal(bodyAsByteArray, &jsonBody); err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, "error")
+		c.AbortWithStatusJSON(http.StatusBadRequest, "неудалось обработать входные данные для регистрации")
 	}
-	token, err := h.authService.Login(jsonBody["phone"], jsonBody["password"])
 
+	token, err := h.authService.Login(jsonBody["phone"], jsonBody["password"])
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, "error")
+		c.AbortWithStatusJSON(http.StatusInternalServerError, "неудалось авторизовать пользователя")
 	}
 	c.JSON(http.StatusOK, token)
 }

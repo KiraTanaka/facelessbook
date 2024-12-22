@@ -15,7 +15,7 @@ var savePushQuery string
 func (r *Repository) Pattern(patternName string) (*models.PushPattern, error) {
 	pushPattern := &models.PushPattern{}
 	if err := r.db.Get(pushPattern, getPushPatternQuery, patternName); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get push pattern: %w", err)
 	}
 	return pushPattern, nil
 }
@@ -23,7 +23,7 @@ func (r *Repository) Pattern(patternName string) (*models.PushPattern, error) {
 func (r *Repository) SavePush(userIds []string, patternName string, params []any) error {
 	tx, err := r.db.Beginx()
 	if err != nil {
-		return err
+		return fmt.Errorf("begin a transaction for save push: %w", err)
 	}
 	defer tx.Rollback()
 
@@ -35,7 +35,7 @@ func (r *Repository) SavePush(userIds []string, patternName string, params []any
 	for _, userId := range userIds {
 		_, err = tx.Exec(savePushQuery, userId, pushPattern.Subject, fmt.Sprintf(pushPattern.Pushmessage, params...), fmt.Sprintf(pushPattern.FullMessage, params...))
 		if err != nil {
-			return err
+			return fmt.Errorf("save push: %w", err)
 		}
 	}
 	tx.Commit()

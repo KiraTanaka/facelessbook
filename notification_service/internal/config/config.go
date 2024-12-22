@@ -22,9 +22,9 @@ type DbConfig struct {
 }
 
 type GrpcConfig struct {
-	GrpcUserHost string        `env:"GRPC_USER_HOST" env-required:"true"`
-	GrpcUserPort int           `env:"GRPC_USER_PORT" env-required:"true"`
-	Timeout      time.Duration `env:"GRPC_TIMEOUT" env-required:"true"`
+	UserHost string        `env:"GRPC_USER_HOST" env-required:"true"`
+	UserPort int           `env:"GRPC_USER_PORT" env-required:"true"`
+	Timeout  time.Duration `env:"GRPC_TIMEOUT" env-required:"true"`
 }
 type KafkaConfig struct {
 	Host string `env:"KAFKA_HOST" env-required:"true"`
@@ -36,13 +36,13 @@ func GetAppConfig() (*Config, error) {
 	grpcConfig := &GrpcConfig{}
 	kafkaConfig := &KafkaConfig{}
 	if err := cleanenv.ReadConfig(".env", dbConfig); err != nil {
-		return nil, fmt.Errorf("read db config error: %w", err)
+		return nil, fmt.Errorf("read db config: %w", err)
 	}
 	if err := cleanenv.ReadConfig(".env", grpcConfig); err != nil {
-		return nil, fmt.Errorf("read grpc config error: %w", err)
+		return nil, fmt.Errorf("read grpc config: %w", err)
 	}
 	if err := cleanenv.ReadConfig(".env", kafkaConfig); err != nil {
-		return nil, fmt.Errorf("read kafka config error: %w", err)
+		return nil, fmt.Errorf("read kafka config: %w", err)
 	}
 
 	return &Config{

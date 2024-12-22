@@ -6,8 +6,6 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
-
-	log "github.com/sirupsen/logrus"
 )
 
 type Repository struct {
@@ -22,17 +20,13 @@ func NewConnect(config *config.DbConfig) (*Repository, error) {
 
 	db, err := sqlx.Connect("postgres", psqlInfo)
 	if err != nil {
-		log.Error(err)
-		return nil, err
+		return nil, fmt.Errorf("connect to a database: %w", err)
 	}
 
 	err = db.Ping()
 	if err != nil {
-		log.Error(err)
-		return nil, err
+		return nil, fmt.Errorf("verifies a connection to the database: %w", err)
 	}
 
-	return &Repository{
-		db: db,
-	}, nil
+	return &Repository{db: db}, nil
 }

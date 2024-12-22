@@ -22,8 +22,8 @@ type DbConfig struct {
 }
 
 type GrpcConfig struct {
-	GrpcPort    int           `env:"GRPC_PORT" env-required:"true"`
-	GrpcTimeout time.Duration `env:"GRPC_TIMEOUT" env-required:"true"`
+	ServerPort int           `env:"GRPC_SERVER_PORT" env-required:"true"`
+	Timeout    time.Duration `env:"GRPC_TIMEOUT" env-required:"true"`
 }
 
 type TokenConfig struct {

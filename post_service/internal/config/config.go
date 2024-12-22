@@ -22,8 +22,8 @@ type DbConfig struct {
 }
 
 type GrpcConfig struct {
-	Port    int           `env:"GRPC_SERVER_PORT" env-required:"true"`
-	Timeout time.Duration `env:"GRPC_TIMEOUT" env-required:"true"`
+	ServerPort int           `env:"GRPC_SERVER_PORT" env-required:"true"`
+	Timeout    time.Duration `env:"GRPC_TIMEOUT" env-required:"true"`
 }
 type KafkaConfig struct {
 	Host string `env:"KAFKA_HOST" env-required:"true"`

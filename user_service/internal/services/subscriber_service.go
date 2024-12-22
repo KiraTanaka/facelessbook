@@ -21,7 +21,6 @@ func NewSubscriberService(repository *db.Repository) SubscriberService {
 
 func (s *subscriberService) ListSubscribers(publisherId string) ([]string, error) {
 	subscriberIds, err := s.repository.ListSubscribers(publisherId)
-
 	if err != nil {
 		log.Error(err)
 		return nil, err

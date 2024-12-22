@@ -20,12 +20,12 @@ func NewConnect(config *config.DbConfig) (*Repository, error) {
 
 	db, err := sqlx.Connect("postgres", psqlInfo)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("connect to a database: %w", err)
 	}
 
 	err = db.Ping()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("verifies a connection to the database: %w", err)
 	}
 	repository := &Repository{db: db}
 
