@@ -3,3 +3,4 @@ INSERT INTO posts
 			text)
 VALUES     ($1,
 			$2)
+RETURNING id

@@ -16,11 +16,11 @@ func NewSubscriberHandler(routes *gin.RouterGroup, subscriberService services.Su
 	handler.subscriberService = subscriberService
 	subscriberRoutes := routes.Group("/users")
 	{
-		subscriberRoutes.POST("/users/:userId/subscribe", handler.Subscribe)
+		subscriberRoutes.POST("/:userId/subscribe", handler.Subscribe)
 
-		subscriberRoutes.GET("/users/:userId/subscribers", handler.ListSubscribers)
+		subscriberRoutes.GET("/:userId/subscribers", handler.ListSubscribers)
 
-		subscriberRoutes.DELETE("/users/:userId/unsubscribe", handler.Unsubscribe)
+		subscriberRoutes.DELETE("/:userId/unsubscribe", handler.Unsubscribe)
 
 	}
 
@@ -59,7 +59,7 @@ func (h *subscriberHandler) Unsubscribe(c *gin.Context) {
 		return
 	}
 
-	if err = h.subscriberService.Subscribe(publisherId, jsonBody["subscriber_id"]); err != nil {
+	if err = h.subscriberService.Unsubscribe(publisherId, jsonBody["subscriber_id"]); err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, "неудалось отписаться от пользователя")
 		return
 

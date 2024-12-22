@@ -74,7 +74,7 @@ func (s *postServer) Update(ctx context.Context, request *pb.UpdateRequest) (*pb
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	return &pb.UpdateResponse{}, nil
+	return &pb.UpdateResponse{Success: true}, nil
 }
 
 func (s *postServer) Delete(ctx context.Context, request *pb.DeleteRequest) (*pb.DeleteResponse, error) {
@@ -86,7 +86,7 @@ func (s *postServer) Delete(ctx context.Context, request *pb.DeleteRequest) (*pb
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	return &pb.DeleteResponse{}, nil
+	return &pb.DeleteResponse{Success: true}, nil
 }
 
 func PostModelToPostMessage(post *models.Post) *pb.PostInformation {
